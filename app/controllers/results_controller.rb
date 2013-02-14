@@ -87,11 +87,11 @@ end
 def crawl_it
   @result = Result.find(params[:id])
   @burger = ''
-    Anemone.crawl(@result.url) do |anemone|
-      anemone.on_every_page do |page|
-        @burger += page.url.to_s
+  Anemone.crawl(@result.url) do |anemone|
+      anemone.on_pages_like(/posts/) do |page|
+        @burger += page.body
         @burger += ','
-      end
+       end
     end
   @patties = @burger.split(',')
 end
