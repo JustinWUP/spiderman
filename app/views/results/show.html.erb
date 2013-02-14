@@ -1,0 +1,7 @@
+<p id="notice"><%= notice %></p>
+<% @patties.each do |patty| %>
+  <%= patty%>
+<% end %>
+
+<%= link_to 'Edit', edit_result_path(@result) %> |
+<%= link_to 'Back', results_path %>
