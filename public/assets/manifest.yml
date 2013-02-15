@@ -1,0 +1,11 @@
+---
+testdata.txt: testdata-ec5402031c35dc40e58dc2363266b547.txt
+testdata/index.txt: testdata-ec5402031c35dc40e58dc2363266b547.txt
+rails.png: rails-a3386665c05a2d82f711a4aaa72d247c.png
+rails/index.png: rails-a3386665c05a2d82f711a4aaa72d247c.png
+application.js: application-9a717ea62eac3463d689b2ba0a4e85b4.js
+application/index.js: application-9a717ea62eac3463d689b2ba0a4e85b4.js
+application.css: application-9a3c95e896b198362a0438801158beaa.css
+application/index.css: application-9a3c95e896b198362a0438801158beaa.css
+jquery.min.map: jquery.min-6c267bfd2b3f36e6edccb2e584934c1c.map
+jquery/index.min.map: jquery.min-6c267bfd2b3f36e6edccb2e584934c1c.map
