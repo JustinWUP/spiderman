@@ -89,10 +89,12 @@ class ResultsController < ApplicationController
     # folder = URI.parse(@result.url).host
     # FileUtils.mkdir_p(File.join(".",folder))
     @results.each do |result|
+      @targets = result.target.split('@') if result.target
+      @replacements = result.replacement.split('@') if result.replacement
       FileUtils.mkdir_p("#{Rails.root}/app/assets/cache/")
       Anemone.crawl(result.url) do |anemone|
-        anemone.on_pages_like(/posts/) do |page|
-          page.links.keep_if {|link| link.to_s.match(/\?page\=|\d{1,2}$/)}
+        anemone.on_pages_like(result.pageslike) do |page|
+          page.links.keep_if {|link| link.to_s.match()}
           # filename = page.url.request_uri.to_s
           # filename = "/index.html" if filename == "/" # Make sure the file name is valid
           # folders = filename.split("/")
@@ -101,6 +103,7 @@ class ResultsController < ApplicationController
           @file = "#{Rails.root}/app/assets/cache/" + result.title + '.txt'
           print "Downloading '#{page.url}'...\n"
           @burger += page.body.to_s
+
 
       
         # File.open(File.join(".",folder,folders,filename),"w") {|f| f.write(page.body.force_encoding('UTF-8'))}
@@ -126,11 +129,20 @@ class ResultsController < ApplicationController
     @files = Dir.entries("#{Rails.root}/app/assets/cache")
     @files.delete('.') 
     @files.delete('..') 
+    @files.delete('.DS_Store') 
     @files.each do |burger| 
+      result = Result.find_by_title(burger.gsub('.com.txt', ''))
+      @targets = result.target.split('@') if result.target
+      @replacements = result.replacement.split('@') if result.replacement
       smash = Nokogiri::HTML(open("#{Rails.root}/app/assets/cache/" + burger )) 
-      smash.css('td.views-field-title a').each do |link| 
-        eatit = link.to_s.gsub('href="','href="http://www.startupers.com').gsub('">', '" target="blank">')
-        Job.create(link: eatit, jobboard: File.basename(burger,".txt"))
+      smash.css(result.element).each do |link| 
+        @eatit = link.to_s
+        @iterator = 0
+        @targets.each do |target|
+          @eatit =  @eatit.gsub(@targets[@iterator].to_s, @replacements[@iterator].to_s)
+          @iterator += 1
+        end
+        Job.create(link: @eatit, jobboard: File.basename(burger,".txt"))
       end
     end   
     redirect_to '/dedupe'
