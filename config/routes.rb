@@ -1,6 +1,9 @@
 Spiderman::Application.routes.draw do
   resources :results
   root :to => 'results#index'
+  match '/cache' => 'results#crawl'
+  match '/munch' => 'results#munch', :as => 'munch'
+  match '/dedupe' => 'results#dedupe'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

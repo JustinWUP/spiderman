@@ -1,38 +1,20 @@
 
-<% burger = Nokogiri::HTML(open("#{Rails.root}/app/assets/cache/testdata.txt")) %>
 <table>
   <tr>
     <td>Title</td>
     <!-- <td>City</td> -->
     <td>Job Site</td>
   </tr>
-
- <% burger.css('td.views-field-title').each do |link| %>
-<% eatit = link.to_s.gsub('href="','href="http://www.startupers.com').gsub('">', '" target="blank">') %>
- <tr>
-<%= raw eatit %>
-<td><%= "Via Startupers.com" %></td>
-<%# tag('br') %>
-</tr>
-<% end %>
-</table>
-
-<h1>Listing results</h1>
-
-<table>
+  <% @jobs.each do |job| %>
   <tr>
-    <th></th>
-    <th></th>
-    <th></th>
+  <td>
+      <%= raw job.link %>
+    </td>
+    <td>
+      Via <%= job.jobboard %>
+    </td>
   </tr>
-
-<% @results.each do |result| %>
-  <tr>
-    <td><%= link_to 'Show', result %></td>
-    <td><%= link_to 'Edit', edit_result_path(result) %></td>
-    <td><%= link_to 'Destroy', result, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-  </tr>
-<% end %>
+  <% end %>
 </table>
 
 <br />
