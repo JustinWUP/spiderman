@@ -89,12 +89,10 @@ class ResultsController < ApplicationController
     # folder = URI.parse(@result.url).host
     # FileUtils.mkdir_p(File.join(".",folder))
     @results.each do |result|
-      @targets = result.target.split('@') if result.target
-      @replacements = result.replacement.split('@') if result.replacement
       FileUtils.mkdir_p("#{Rails.root}/app/assets/cache/")
       Anemone.crawl(result.url) do |anemone|
-        anemone.on_pages_like(result.pageslike) do |page|
-          page.links.keep_if {|link| link.to_s.match()}
+        anemone.on_pages_like(/#{result.pageslike}/) do |page|
+          page.links.keep_if {|link| link.to_s.match(/#{result.pagesregex}/)}
           # filename = page.url.request_uri.to_s
           # filename = "/index.html" if filename == "/" # Make sure the file name is valid
           # folders = filename.split("/")
@@ -131,9 +129,9 @@ class ResultsController < ApplicationController
     @files.delete('..') 
     @files.delete('.DS_Store') 
     @files.each do |burger| 
-      result = Result.find_by_title(burger.gsub('.com.txt', ''))
-      @targets = result.target.split('@') if result.target
-      @replacements = result.replacement.split('@') if result.replacement
+      result = Result.find_by_title(burger.gsub('.txt', ''))
+      @targets = result.target.split('@@') if result.target
+      @replacements = result.replacement.split('@@') if result.replacement
       smash = Nokogiri::HTML(open("#{Rails.root}/app/assets/cache/" + burger )) 
       smash.css(result.element).each do |link| 
         @eatit = link.to_s
