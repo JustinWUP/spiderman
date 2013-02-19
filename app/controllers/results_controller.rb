@@ -133,16 +133,23 @@ class ResultsController < ApplicationController
       @targets = result.target.split('@@') if result.target
       @replacements = result.replacement.split('@@') if result.replacement
       smash = Nokogiri::HTML(open("#{Rails.root}/app/assets/cache/" + burger )) 
-      smash.css(result.element).each do |link| 
+      #smash.css(result.element).each do |link| 
+      smash.css('.views-table tr').each do |link|
         @eatit = link.to_s
         @iterator = 0
-        @targets.each do |target|
-          @eatit =  @eatit.gsub(@targets[@iterator].to_s, @replacements[@iterator].to_s)
-          @iterator += 1
+        smash.css(result.element).each do |test|
+          @targets.each do |target|
+            @eatit =  @eatit.gsub(@targets[@iterator].to_s, @replacements[@iterator].to_s)
+            @iterator += 1
+          end
         end
-        Job.create(link: @eatit, jobboard: File.basename(burger,".txt"))
-      end
-    end   
+        smash.css('views-field-city-1 td').each do |city| 
+          @city = city
+        end
+      
+      end 
+        Job.create(link: @eatit, city: @city, jobboard: File.basename(burger,".txt"))  
+    end
     redirect_to '/dedupe'
   end
 
