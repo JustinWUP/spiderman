@@ -132,25 +132,21 @@ class ResultsController < ApplicationController
       result = Result.find_by_title(burger.gsub('.txt', ''))
       @targets = result.target.split('@@') if result.target
       @replacements = result.replacement.split('@@') if result.replacement
-      smash = Nokogiri::HTML(open("#{Rails.root}/app/assets/cache/" + burger )) 
-      #smash.css(result.element).each do |link| 
-      smash.css('.views-table tr').each do |link|
-        @eatit = link.to_s
+      smash = Nokogiri::HTML(open("#{Rails.root}/app/assets/cache/" + burger )).css(result.element).collect do |row|
+        @eatit = ActionController::Base.helpers.sanitize row.at("td[#{result.linkcell}]").to_s, :tags => %w(a href) 
+        @company = ActionController::Base.helpers.strip_tags(row.at("td[#{result.companycell}]").to_s)
+        @city =  ActionController::Base.helpers.strip_tags(row.at("td[#{result.citycell}]").to_s)
+        @posted =  ActionController::Base.helpers.strip_tags(row.at("td[#{result.postedcell}]").to_s)
         @iterator = 0
-        smash.css(result.element).each do |test|
           @targets.each do |target|
             @eatit =  @eatit.gsub(@targets[@iterator].to_s, @replacements[@iterator].to_s)
             @iterator += 1
           end
-        end
-        smash.css('views-field-city-1 td').each do |city| 
-          @city = city
-        end
-      
-      end 
-        Job.create(link: @eatit, city: @city, jobboard: File.basename(burger,".txt"))  
+          Job.create(link: @eatit, city: @city, company: @company, posted: @posted, jobboard:  File.basename(burger,".txt")) unless(@eatit == "")
+      end
     end
-    redirect_to '/dedupe'
+    # redirect_to '/dedupe'
+    redirect_to '/'
   end
 
   def dedupe

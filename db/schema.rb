@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130218180059) do
+ActiveRecord::Schema.define(:version => 20130226164951) do
 
   create_table "jobs", :force => true do |t|
     t.string   "link"
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(:version => 20130218180059) do
     t.string   "company"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.string   "posted"
   end
 
   create_table "results", :force => true do |t|
@@ -32,6 +33,10 @@ ActiveRecord::Schema.define(:version => 20130218180059) do
     t.string   "target"
     t.string   "replacement"
     t.string   "pagesregex"
+    t.string   "linkcell"
+    t.string   "companycell"
+    t.string   "citycell"
+    t.string   "postedcell"
   end
 
 end
