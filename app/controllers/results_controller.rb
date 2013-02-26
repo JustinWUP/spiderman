@@ -152,13 +152,13 @@ class ResultsController < ApplicationController
   def dedupe
     @jobs = Job.all
     @jobs.each do |job|
-    count = Job.find_all_by_link(job.link).count
-      if count >1
-        count -1
-        Job.find_all_by_link(job.link).delete.count.times
+      count = Job.find_all_by_link(job.link).count
+      if count > 1
+        count - 1
+        Job.find_all_by_link(job.link).delete count.times
       end
     end
-  redirect_to :root
+    redirect_to :root
   end
 
 end
