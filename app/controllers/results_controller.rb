@@ -91,8 +91,8 @@ class ResultsController < ApplicationController
     @results.each do |result|
       FileUtils.mkdir_p("#{Rails.root}/app/assets/cache/")
       Anemone.crawl(result.url) do |anemone|
-        anemone.on_pages_like(/posts/) do |page|
-          page.links.keep_if {|link| link.to_s.match(/\?page\=|\d{1,2}$/)}
+        anemone.on_pages_like(/#{result.pageslike}/) do |page|
+          page.links.keep_if {|link| link.to_s.match(/#{result.pagesregex}/)}
           # filename = page.url.request_uri.to_s
           # filename = "/index.html" if filename == "/" # Make sure the file name is valid
           # folders = filename.split("/")
@@ -101,6 +101,7 @@ class ResultsController < ApplicationController
           @file = "#{Rails.root}/app/assets/cache/" + result.title + '.txt'
           print "Downloading '#{page.url}'...\n"
           @burger += page.body.to_s
+
 
       
         # File.open(File.join(".",folder,folders,filename),"w") {|f| f.write(page.body.force_encoding('UTF-8'))}
@@ -126,26 +127,38 @@ class ResultsController < ApplicationController
     @files = Dir.entries("#{Rails.root}/app/assets/cache")
     @files.delete('.') 
     @files.delete('..') 
+    @files.delete('.DS_Store') 
     @files.each do |burger| 
-      smash = Nokogiri::HTML(open("#{Rails.root}/app/assets/cache/" + burger )) 
-      smash.css('td.views-field-title a').each do |link| 
-        eatit = link.to_s.gsub('href="','href="http://www.startupers.com').gsub('">', '" target="blank">')
-        Job.create(link: eatit, jobboard: File.basename(burger,".txt"))
+      result = Result.find_by_title(burger.gsub('.txt', ''))
+      @targets = result.target.split('@@') if result.target
+      @replacements = result.replacement.split('@@') if result.replacement
+      smash = Nokogiri::HTML(open("#{Rails.root}/app/assets/cache/" + burger )).css(result.element).collect do |row|
+        @eatit = ActionController::Base.helpers.sanitize row.at("td[#{result.linkcell}]").to_s, :tags => %w(a href) 
+        @company = ActionController::Base.helpers.strip_tags(row.at("td[#{result.companycell}]").to_s)
+        @city =  ActionController::Base.helpers.strip_tags(row.at("td[#{result.citycell}]").to_s)
+        @posted =  ActionController::Base.helpers.strip_tags(row.at("td[#{result.postedcell}]").to_s)
+        @iterator = 0
+          @targets.each do |target|
+            @eatit =  @eatit.gsub(@targets[@iterator].to_s, @replacements[@iterator].to_s)
+            @iterator += 1
+          end
+          Job.create(link: @eatit, city: @city, company: @company, posted: @posted, jobboard:  File.basename(burger,".txt")) unless(@eatit == "")
       end
-    end   
-    redirect_to '/dedupe'
+    end
+    # redirect_to '/dedupe'
+    redirect_to '/'
   end
 
   def dedupe
     @jobs = Job.all
     @jobs.each do |job|
-    count = Job.find_all_by_link(job.link).count
-      if count >1
-        count -1
-        Job.find_all_by_link(job.link).delete.count.times
+      count = Job.find_all_by_link(job.link).count
+      if count > 1
+        count - 1
+        Job.find_all_by_link(job.link).delete count.times
       end
     end
-  redirect_to :root
+    redirect_to :root
   end
 
 end

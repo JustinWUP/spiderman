@@ -1,14 +1,23 @@
+<h1>Job Board</h1>
+<h2>Search legit startup jobs in one place</h2>
 
 <table>
   <tr>
     <td>Title</td>
-    <!-- <td>City</td> -->
+    <td>Company</td>
+    <td>City</td>
     <td>Job Site</td>
   </tr>
   <% @jobs.each do |job| %>
   <tr>
   <td>
       <%= raw job.link %>
+    </td>
+          <td>
+      <%= raw job.company %>
+    </td>
+      <td>
+      <%= raw job.city %>
     </td>
     <td>
       Via <%= job.jobboard %>
