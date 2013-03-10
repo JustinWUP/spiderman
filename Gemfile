@@ -9,7 +9,7 @@ gem 'anemone'
 gem 'thin'
 gem 'sunspot_rails'
 gem 'sunspot_solr' # optional pre-packaged Solr distribution for use in development
-gem 'progress_bar'
+gem 'progress_bar' 
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
