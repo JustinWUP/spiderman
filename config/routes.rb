@@ -1,5 +1,10 @@
 Spiderman::Application.routes.draw do
-  resources :results
+  resources :results do
+    collection do
+      get :search 
+    end
+  end
+  
   root :to => 'results#index'
   match '/cache' => 'results#crawl'
   match '/munch' => 'results#munch', :as => 'munch'

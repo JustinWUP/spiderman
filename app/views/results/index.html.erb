@@ -1,15 +1,40 @@
+<script type="text/javascript">
+$(document).ready(function() { 
+    $("#jobs") 
+    .tablesorter({widthFixed: true, sortList: [[0,1]]}) 
+    .tablesorterPager({container: $("#pager")}); 
+});  
+</script>
+
+<%= form_tag search_results_path, :method => :get do %>
+<p>
+  <%= text_field_tag :query, params[:query] %> <%= submit_tag "Search!" %>
+</p>
+<% end %>
+
+
 <h1>Job Board</h1>
 <h2>Search legit startup jobs in one place</h2>
-
-<table>
+<% if @jobs == [] %>
+ AINT GOT NO JOBS HERE
+<% end %>
+<table id="jobs"  class="tablesorter">
+  <thead>
   <tr>
-    <td>Title</td>
-    <td>Company</td>
-    <td>City</td>
-    <td>Job Site</td>
+    <th>Posted on</th>
+    <th>Title</th>
+    <th>Company</th>
+    <th>City</th>
+    <th>Job Site</th>
   </tr>
+</thead>
+  <tbody>
   <% @jobs.each do |job| %>
+
   <tr>
+      <td>
+      <%= raw job.posted.to_date %>
+    </td>
   <td>
       <%= raw job.link %>
     </td>
@@ -24,8 +49,21 @@
     </td>
   </tr>
   <% end %>
+</tbody>
 </table>
-
+<div id="pager" class="pager"><form>
+    <%= image_tag('first.png', :class => 'first') %>
+    <%= image_tag('prev.png', :class => 'prev') %>
+    <input type="text" class="pagedisplay">
+    <%= image_tag('next.png', :class => 'next') %>
+    <%= image_tag('last.png', :class => 'last') %>
+    <select class="pagesize">
+      <option selected="selected" value="10">10</option>
+      <option value="20">20</option>
+      <option value="30">30</option>
+      <option value="40">40</option>
+    </select>
+  </form></div>
 <br />
 
 <%= link_to 'New Result', new_result_path %>

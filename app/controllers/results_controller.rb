@@ -161,6 +161,16 @@ class ResultsController < ApplicationController
     redirect_to :root
   end
 
+  def search 
+    @jobs = Job.search do
+      fulltext params[:query]
+    end.results
+    respond_to do |format|
+    format.html { render :action => "index" }
+    format.xml  { render :xml => @jobs }
+  end
+  end
+
 end
 
 
